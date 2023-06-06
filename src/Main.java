@@ -9,7 +9,6 @@ public class Main {
 
         System.exit(0);
 
-// test
         Scanner scanner = new Scanner(System.in);
         System.out.print("Please select difficulty (E, M, H): ");
         String diff = scanner.nextLine();
