@@ -82,6 +82,9 @@ public class MinesweeperSolver {
             runs = 0;
             for(int r = 0; r < solverBoard.length; r++) {
                 for(int c = 0; c < solverBoard[0].length; c++) {
+                    if(interpret(minesweeper.readSquare(r, c)).isCovered()) {
+                        continue;
+                    }
                     row = r;
                     col = c;
                     //System.out.println("Checking (" + row + ", " + col + ")");
@@ -124,6 +127,9 @@ public class MinesweeperSolver {
             // And we continue by then clicking all the squares we can :)
             for(int r = 0; r < solverBoard.length; r++) {
                 for(int c = 0; c < solverBoard[0].length; c++) {
+                    if(interpret(minesweeper.readSquare(r, c)).isCovered()) {
+                        continue;
+                    }
                     row = r;
                     col = c;
                     //System.out.println("Checking (" + row + ", " + col + ")");
@@ -141,8 +147,15 @@ public class MinesweeperSolver {
                         }
                     }
                     //System.out.println("Flagged: " + flagged + ", Number: " + solverBoard[row][col].getNumber());
-                    if(solverBoard[row][col].getNumber() == flagged && flagged > 0) {
+                    int reducedNumber = solverBoard[row][col].getNumber() - flagged;
+                    /*
+                    if(reducedNumber < 0) {
+                        reducedNumber = 0;
+                    } */
+                    //System.out.println("(" + r + ", " + c + "): " + solverBoard[row][col].getNumber() + " - " + flagged + " = " + reducedNumber);
 
+                    /*
+                    if(reducedNumber == 0 && flagged > 0) {
                         for(int i = rl; i <= ru; i++) {
                             for(int j = cl; j <= cu; j++) {
                                 if(interpret(minesweeper.readSquare(i, j)).isCovered() && !interpret(minesweeper.readSquare(i, j)).isFlagged() && !(i == row && j == col)) {
@@ -152,7 +165,42 @@ public class MinesweeperSolver {
                             }
                         }
                     }
+                    */
+
+
+                    int[][] possible;
+                    if(reducedNumber <= 0) {
+                        possible = new int[2][1];
+                        possible[0][0] = -1;
+                        possible[1][0] = -1;
+
+                    } else {
+                        possible = new int[2][reducedNumber];
+                    }
+                    int count = 0;
+                    for(int i = rl; i <= ru; i++) {
+                        for(int j = cl; j <= cu; j++) {
+                            if(interpret(minesweeper.readSquare(i, j)).isCovered() && !interpret(minesweeper.readSquare(i, j)).isFlagged() && !(i == row && j == col)) {
+                                if(reducedNumber == 0 && flagged > 0) {
+                                    minesweeper.click(i, j);
+                                    runs++;
+                                } else if(reducedNumber > 0) {
+                                    if(count < reducedNumber) {
+                                        possible[0][count] = i;
+                                        possible[1][count] = j;
+                                        count++;
+                                        System.out.println("(" + i + ", " + j + ") ");
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+
+
+
                     updateBoard(minesweeper);
+                    //minesweeper.print();
                 }
             }
         }
